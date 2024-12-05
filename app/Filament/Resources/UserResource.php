@@ -74,5 +74,4 @@ class UserResource extends Resource
             'edit' => UserResource\Pages\EditUsers::route('/{record}/edit'),
         ];
     }
-
 }

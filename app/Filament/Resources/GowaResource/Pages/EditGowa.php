@@ -22,17 +22,16 @@ class EditGowa extends EditRecord
     {
         Log::log('info', 'updateCustomer', $data);
 
-//        if ($data['chatwoot']['host']) {
-//            $chatwoot = Chatwoot::create([
-//                'host' => $data['chatwoot']['host'],
-//                'token' => $data['chatwoot']['token'],
-//                'bot_token' => $data['chatwoot']['bot_token'],
-//                'force_update' => $data['chatwoot']['force_update'] ?? null,
-//            ]);
-//            $data['chatwoot_id'] = $chatwoot->id;
-//        }
+        //        if ($data['chatwoot']['host']) {
+        //            $chatwoot = Chatwoot::create([
+        //                'host' => $data['chatwoot']['host'],
+        //                'token' => $data['chatwoot']['token'],
+        //                'bot_token' => $data['chatwoot']['bot_token'],
+        //                'force_update' => $data['chatwoot']['force_update'] ?? null,
+        //            ]);
+        //            $data['chatwoot_id'] = $chatwoot->id;
+        //        }
 
         return $data;
     }
-
 }

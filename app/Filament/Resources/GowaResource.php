@@ -13,7 +13,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 
 class GowaResource extends Resource implements HasShieldPermissions
 {
@@ -54,8 +53,7 @@ class GowaResource extends Resource implements HasShieldPermissions
                         ->nullable()
                         ->helperText('e.g. https://webhook.site/1a2b3c4d')
                         ->columnSpan(12)
-                        ->label('Webhook URL'),]),
-
+                        ->label('Webhook URL'), ]),
 
                 Section::make('Chatwoot Details (optional)')
                     ->schema([

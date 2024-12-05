@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,8 +10,8 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasRoles;
     use HasFactory, Notifiable;
+    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -50,6 +49,6 @@ class User extends Authenticatable
 
     public function gowas(): BelongsToMany
     {
-        return $this->belongsToMany(Gowa::class );
+        return $this->belongsToMany(Gowa::class);
     }
 }
