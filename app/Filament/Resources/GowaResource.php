@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CustomerResource\Pages;
+use App\Filament\Resources\GowaResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers\UsersRelationManager;
+use App\Livewire\MessageDeliveryTable;
+use App\Livewire\MessagesGowa;
 use App\Models\Gowa;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms\Components\Fieldset;
@@ -11,8 +13,12 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Livewire;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
 
 class GowaResource extends Resource implements HasShieldPermissions
 {
@@ -24,6 +30,8 @@ class GowaResource extends Resource implements HasShieldPermissions
 
     public static function form(Form $form): Form
     {
+        $isSuperAdmin = auth()->user()->hasRole('super_admin');
+
         return $form
             ->schema([
                 Fieldset::make('Label')
@@ -31,14 +39,19 @@ class GowaResource extends Resource implements HasShieldPermissions
                         TextInput::make('name')
                             ->columns(6)
                             ->required(),
+
                         TextInput::make('port')
                             ->prefix('380')
+                            ->disabled(!$isSuperAdmin)
                             ->columns(6)
                             ->type('number')
                             ->required(),
-                        TextInput::make('token')->columns(6)
+                        TextInput::make('token')
+                            ->columns(6)
                             ->required(),
-                        TextInput::make('service_name')->columns(6)
+                        TextInput::make('service_name')
+                            ->disabled(!$isSuperAdmin)
+                            ->columns(6)
                             ->required(),
                         Toggle::make('active')
                             ->label('Active')->columns(6)
@@ -53,7 +66,7 @@ class GowaResource extends Resource implements HasShieldPermissions
                         ->nullable()
                         ->helperText('e.g. https://webhook.site/1a2b3c4d')
                         ->columnSpan(12)
-                        ->label('Webhook URL'), ]),
+                        ->label('Webhook URL'),]),
 
                 Section::make('Chatwoot Details (optional)')
                     ->schema([
@@ -79,7 +92,20 @@ class GowaResource extends Resource implements HasShieldPermissions
 
     public static function table(Tables\Table $table): Tables\Table
     {
+
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                $isSuperAdmin = auth()->user()->hasRole('super_admin');
+
+                if ($isSuperAdmin) {
+                    return $query;
+                }
+
+                // For non-super admin users, only show records related to their Gowa
+                return $query->whereHas('users', function (Builder $subQuery) {
+                    $subQuery->where('user_id', auth()->id());
+                });
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('service_name'),
@@ -100,6 +126,75 @@ class GowaResource extends Resource implements HasShieldPermissions
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Fieldset::make('Info')
+                    ->schema([
+                        TextEntry::make('name')
+                            ->label('Service')
+                            ->size(TextEntry\TextEntrySize::Large)
+                            ->columns(12),
+                        TextEntry::make('active')
+                            ->formatStateUsing(fn(string $state): string => __($state === '1' ? 'Active' : 'Non Active'))
+                            ->label('Service')
+                            ->size(TextEntry\TextEntrySize::Large)
+                            ->badge()
+                            ->color(fn(string $state): string => match ($state) {
+                                '1' => 'success',
+                                '0' => 'warning',
+                            }),
+                    ]),
+                \Filament\Infolists\Components\Fieldset::make('Statistics')
+                    ->columns(12)
+                    ->schema([
+                        TextEntry::make('active')
+                            ->columnSpan(2)
+                            ->formatStateUsing(fn(string $state): string => __('Active'))
+                            ->label('Draft')
+                            ->size(TextEntry\TextEntrySize::Large)
+                            ->badge()
+                            ->color('warning'),
+                        TextEntry::make('active')
+                            ->columnSpan(2)
+                            ->formatStateUsing(fn(string $state): string => __('Active'))
+                            ->label('Pending')
+                            ->size(TextEntry\TextEntrySize::Large)
+                            ->badge()
+                            ->color('info'),
+                        TextEntry::make('active')
+                            ->columnSpan(2)
+                            ->formatStateUsing(fn(string $state): string => __('Active'))
+                            ->label('Error')
+                            ->size(TextEntry\TextEntrySize::Large)
+                            ->badge()
+                            ->color('danger'),
+                        TextEntry::make('active')
+                            ->columnSpan(2)
+                            ->formatStateUsing(fn(string $state): string => __('Active'))
+                            ->label('Sent')
+                            ->size(TextEntry\TextEntrySize::Large)
+                            ->badge()
+                            ->color('success'),
+                        TextEntry::make('active')
+                            ->formatStateUsing(fn(string $state): string => __('Active'))
+                            ->label('Sent Today')
+                            ->columnSpan(4)
+                            ->size(TextEntry\TextEntrySize::Large)
+                            ->badge()
+                            ->color('success'),
+                    ]),
+
+                \Filament\Infolists\Components\Fieldset::make('Messages')
+                    ->schema([
+                        Livewire::make(MessageDeliveryTable::class)
+                            ->columnSpan(12),
+                    ]),
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -112,6 +207,7 @@ class GowaResource extends Resource implements HasShieldPermissions
         return [
             'index' => Pages\ListGowas::route('/'),
             'create' => Pages\CreateGowa::route('/create'),
+            'view' => Pages\ViewGowa::route('/{record}'),
             'edit' => Pages\EditGowa::route('/{record}/edit'),
         ];
     }

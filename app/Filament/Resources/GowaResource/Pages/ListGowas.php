@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\CustomerResource\Pages;
+namespace App\Filament\Resources\GowaResource\Pages;
 
 use App\Filament\Resources\GowaResource;
 use Filament\Actions;
