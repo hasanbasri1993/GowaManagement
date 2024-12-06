@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\GowaResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers\UsersRelationManager;
 use App\Livewire\MessageDeliveryTable;
-use App\Livewire\MessagesGowa;
 use App\Models\Gowa;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms\Components\Fieldset;
