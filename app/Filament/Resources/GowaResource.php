@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\GowaResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers\UsersRelationManager;
-use App\Livewire\MessageDeliveryTable;
 use App\Models\Gowa;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms\Components\Fieldset;
@@ -12,9 +11,6 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Livewire;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -122,75 +118,6 @@ class GowaResource extends Resource implements HasShieldPermissions
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
-    }
-
-    public static function infolist(Infolist $infolist): Infolist
-    {
-
-        return $infolist
-            ->schema([
-                \Filament\Infolists\Components\Fieldset::make('Info')
-                    ->schema([
-                        TextEntry::make('name')
-                            ->label('Service')
-                            ->size(TextEntry\TextEntrySize::Large)
-                            ->columns(12),
-                        TextEntry::make('active')
-                            ->formatStateUsing(fn(string $state): string => __($state === '1' ? 'Active' : 'Non Active'))
-                            ->label('Service')
-                            ->size(TextEntry\TextEntrySize::Large)
-                            ->badge()
-                            ->color(fn(string $state): string => match ($state) {
-                                '1' => 'success',
-                                '0' => 'warning',
-                            }),
-                    ]),
-                \Filament\Infolists\Components\Fieldset::make('Statistics')
-                    ->columns(12)
-                    ->schema([
-                        TextEntry::make('active')
-                            ->columnSpan(2)
-                            ->formatStateUsing(fn(string $state): string => __('Active'))
-                            ->label('Draft')
-                            ->size(TextEntry\TextEntrySize::Large)
-                            ->badge()
-                            ->color('warning'),
-                        TextEntry::make('active')
-                            ->columnSpan(2)
-                            ->formatStateUsing(fn(string $state): string => __('Active'))
-                            ->label('Pending')
-                            ->size(TextEntry\TextEntrySize::Large)
-                            ->badge()
-                            ->color('info'),
-                        TextEntry::make('active')
-                            ->columnSpan(2)
-                            ->formatStateUsing(fn(string $state): string => __('Active'))
-                            ->label('Error')
-                            ->size(TextEntry\TextEntrySize::Large)
-                            ->badge()
-                            ->color('danger'),
-                        TextEntry::make('active')
-                            ->columnSpan(2)
-                            ->formatStateUsing(fn(string $state): string => __('Active'))
-                            ->label('Sent')
-                            ->size(TextEntry\TextEntrySize::Large)
-                            ->badge()
-                            ->color('success'),
-                        TextEntry::make('active')
-                            ->formatStateUsing(fn(string $state): string => __('Active'))
-                            ->label('Sent Today')
-                            ->columnSpan(4)
-                            ->size(TextEntry\TextEntrySize::Large)
-                            ->badge()
-                            ->color('success'),
-                    ]),
-
-                \Filament\Infolists\Components\Fieldset::make('Messages')
-                    ->schema([
-                        Livewire::make(MessageDeliveryTable::class)
-                            ->columnSpan(12),
-                    ]),
             ]);
     }
 

@@ -49,4 +49,9 @@ class MessageDelivery extends Model
         'read_at',
         'full_name',
     ];
+    
+    public function scopeSearch($query, $value): void
+    {
+        $query->where('content','like',"%{$value}%")->orWhere('delivery_status','like',"%{$value}%");
+    }
 }
