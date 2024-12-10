@@ -29,15 +29,14 @@ class GowaResource extends Resource implements HasShieldPermissions
 
         return $form
             ->schema([
-                Fieldset::make('Label')
+                Fieldset::make('Main Information')
                     ->schema([
                         TextInput::make('name')
                             ->columns(6)
                             ->required(),
-
                         TextInput::make('port')
                             ->prefix('380')
-                            ->disabled(!$isSuperAdmin)
+                            ->disabled(! $isSuperAdmin)
                             ->columns(6)
                             ->type('number')
                             ->required(),
@@ -45,7 +44,7 @@ class GowaResource extends Resource implements HasShieldPermissions
                             ->columns(6)
                             ->required(),
                         TextInput::make('service_name')
-                            ->disabled(!$isSuperAdmin)
+                            ->disabled(! $isSuperAdmin)
                             ->columns(6)
                             ->required(),
                         Toggle::make('active')
@@ -61,13 +60,15 @@ class GowaResource extends Resource implements HasShieldPermissions
                         ->nullable()
                         ->helperText('e.g. https://webhook.site/1a2b3c4d')
                         ->columnSpan(12)
-                        ->label('Webhook URL'),]),
+                        ->activeUrl()
+                        ->label('Webhook URL'), ]),
 
                 Section::make('Chatwoot Details (optional)')
                     ->schema([
                         TextInput::make('chatwoot_host')
                             ->label('Chatwoot Host')
                             ->helperText('e.g. https://chatwoot.example.com/1/account/inbox/2')
+                            ->activeUrl()
                             ->nullable(),
                         TextInput::make('chatwoot_token')
                             ->label('Chatwoot Token')

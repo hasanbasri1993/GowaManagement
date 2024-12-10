@@ -10,10 +10,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-
 class MessagesDelivery extends BaseWidget
 {
-
     public function table(Table $table): Table
     {
         return $table
@@ -22,7 +20,7 @@ class MessagesDelivery extends BaseWidget
                     ->label('Lihat')
                     ->modalHeading('Pesan Detail')
                     ->modalSubmitAction(false)
-                    ->modalContent(fn(MessageDelivery $record) => \View::make('livewire.content-modal', [
+                    ->modalContent(fn (MessageDelivery $record) => \View::make('livewire.content-modal', [
                         'content' => $this->format_message($record->content),
                         'record' => $record,
                     ])),
@@ -36,7 +34,7 @@ class MessagesDelivery extends BaseWidget
                         'sent' => 'Sent',
                         'delivered' => 'Delivered',
                         'read' => 'Read',
-                    ])
+                    ]),
             ])
             ->persistFiltersInSession()
             ->defaultSort('created_at', 'desc')
@@ -51,7 +49,6 @@ class MessagesDelivery extends BaseWidget
                 Tables\Columns\TextColumn::make('message_type')
                     ->label('Message Type')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created At')
                     ->sortable(),
@@ -84,6 +81,7 @@ class MessagesDelivery extends BaseWidget
             ['/(\\\(u|U)[a-fA-F0-9]{4,8})/'],
             function ($matches) {
                 $code = preg_replace('/\\\u|\\\U/', '', $matches[0]);
+
                 return "&#x$code;";
             },
             $url

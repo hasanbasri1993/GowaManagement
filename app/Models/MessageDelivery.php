@@ -3,17 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Route;
 
 class MessageDelivery extends Model
 {
-
     protected $table = 'message_deliveries';
 
     public function getConnectionName(): string
     {
-        $id = request()->segment(3); // Assumes 3rd segment is the ID
-        // Dynamically create a SQLite connection at runtime
+        $id = session('db_gowa');
         \Config::set('database.connections.dynamic_sqlite', [
             'driver' => 'sqlite',
             'database' => '/Users/it/PhpstormProjects/GowaManagement/database/db_'.$id,
@@ -23,8 +20,6 @@ class MessageDelivery extends Model
 
         return 'dynamic_sqlite';
     }
-
-
 
     protected $fillable = [
         'fullname',
@@ -49,9 +44,43 @@ class MessageDelivery extends Model
         'read_at',
         'full_name',
     ];
-    
+
     public function scopeSearch($query, $value): void
     {
-        $query->where('content','like',"%{$value}%")->orWhere('delivery_status','like',"%{$value}%");
+        $query->where('content', 'like', "%{$value}%")->orWhere('delivery_status', 'like', "%{$value}%");
+    }
+
+    public static function getMessageCounts(): array
+    {
+        $draftMessages = self::where('delivery_status', 'draft')
+            ->whereNull('deleted_at')
+            ->count();
+
+        $errorMessages = self::where('delivery_status', 'error')
+            ->whereNull('deleted_at')
+            ->count();
+
+        $pendingMessages = self::where('delivery_status', 'pending')
+            ->whereNull('deleted_at')
+            ->count();
+
+        $sentMessages = self::whereNotNull('send_at')
+            ->where('send_at', '!=', '')
+            ->whereNull('deleted_at')
+            ->count();
+
+        $sentMessagesToday = self::whereNotNull('send_at')
+            ->where('send_at', '!=', '')
+            ->whereDate('send_at', now())
+            ->whereNull('deleted_at')
+            ->count();
+
+        return [
+            'draftMessages' => $draftMessages,
+            'errorMessages' => $errorMessages,
+            'pendingMessages' => $pendingMessages,
+            'sentMessages' => $sentMessages,
+            'sentMessagesToday' => $sentMessagesToday,
+        ];
     }
 }
